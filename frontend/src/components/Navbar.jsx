@@ -23,7 +23,10 @@ const Navbar = ({ user, onLogout }) => {
         >
           <span>API Engine</span>
         </div>
-        <div className="navbar-item">
+        <div 
+          className={`navbar-item ${location.pathname === '/settings' ? 'active' : ''}`}
+          onClick={() => navigate('/settings')}
+        >
           <span>Settings</span>
         </div>
       </div>

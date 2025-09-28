@@ -21,18 +21,24 @@ class ApiClient {
    * @param {string} endpoint - The API endpoint (e.g., '/api/users')
    * @param {Object} body - The request body data (optional)
    * @param {Object} options - Additional fetch options (optional)
+   * @param {number} timeout - Timeout in milliseconds (default: 120000 = 2 minutes)
    * @returns {Promise<Object>} - The response data
    */
-  async post(endpoint, body = null, options = {}) {
+  async post(endpoint, body = null, options = {}, timeout = 120000) {
     try {
       const url = `${this.baseURL}${endpoint}`
+      
+      // Create AbortController for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), timeout)
       
       const defaultOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...options.headers
-        }
+        },
+        signal: controller.signal
       }
 
       // Add body if provided
@@ -50,12 +56,15 @@ class ApiClient {
         }
       }
 
-      console.log(`Making POST request to: ${url}`)
+      console.log(`Making POST request to: ${url} (timeout: ${timeout}ms)`)
       if (body) {
         console.log('Request body:', body)
       }
 
       const response = await fetch(url, requestOptions)
+      
+      // Clear timeout on successful response
+      clearTimeout(timeoutId)
       
       // Check if the response is ok
       if (!response.ok) {
@@ -78,7 +87,18 @@ class ApiClient {
       return responseData
 
     } catch (error) {
+      // Clear timeout on error
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      
       console.error('API Client Error:', error)
+      
+      // Handle timeout errors specifically
+      if (error.name === 'AbortError') {
+        throw new Error(`Request timed out after ${timeout}ms`)
+      }
+      
       throw error
     }
   }
@@ -97,6 +117,36 @@ class ApiClient {
    */
   getBaseURL() {
     return this.baseURL
+  }
+
+  /**
+   * Make a POST request with loading state support
+   * @param {string} endpoint - The API endpoint
+   * @param {Object} body - The request body data (optional)
+   * @param {Object} options - Additional fetch options (optional)
+   * @param {number} timeout - Timeout in milliseconds (default: 120000)
+   * @param {Function} onLoadingChange - Callback for loading state changes
+   * @returns {Promise<Object>} - The response data
+   */
+  async postWithLoading(endpoint, body = null, options = {}, timeout = 120000, onLoadingChange = null) {
+    try {
+      if (onLoadingChange) {
+        onLoadingChange(true)
+      }
+      
+      const result = await this.post(endpoint, body, options, timeout)
+      
+      if (onLoadingChange) {
+        onLoadingChange(false)
+      }
+      
+      return result
+    } catch (error) {
+      if (onLoadingChange) {
+        onLoadingChange(false)
+      }
+      throw error
+    }
   }
 
   /**

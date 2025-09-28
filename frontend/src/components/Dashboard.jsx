@@ -7,6 +7,7 @@ import './Dashboard.css'
 const Dashboard = ({ user, onLogout }) => {
   const [dashboardConfig, setDashboardConfig] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [refreshLoading, setRefreshLoading] = useState(false)
   const apiClient = new ApiClient()
 
   // Debug logging
@@ -14,48 +15,71 @@ const Dashboard = ({ user, onLogout }) => {
   console.log('Loading state:', loading)
   console.log('Dashboard config:', dashboardConfig)
 
-  useEffect(() => {
-    // Load dashboard configuration for the specific user
+  // Function to load dashboard data
+  const loadDashboardData = async (forceRefresh = false) => {
     if (!user || Object.keys(user).length === 0 || !user.email) {
       setLoading(false)
       return
     }
 
-    // Send ping login to update last login timestamp
-    const pingLogin = async () => {
-      try {
-        await apiClient.post('/pinglogin', { username: user.email })
-        console.log('Ping login successful for user:', user.email)
-      } catch (error) {
-        console.error('Ping login failed:', error)
-        // Don't block dashboard loading if ping login fails
+    try {
+      if (forceRefresh) {
+        setRefreshLoading(true)
+      } else {
+        setLoading(true)
       }
-    }
 
-    // Execute ping login
-    pingLogin()
+      // Send ping login to update last login timestamp
+      const pingLogin = async () => {
+        try {
+          await apiClient.post('/pinglogin', { username: user.email })
+          console.log('Ping login successful for user:', user.email)
+        } catch (error) {
+          console.error('Ping login failed:', error)
+          // Don't block dashboard loading if ping login fails
+        }
+      }
 
-    fetch('/dash_config.json')
-      .then(response => response.json())
-      .then(data => {
-        // Get the user's specific dashboard configuration
-        const userDashboard = data.dashboard[user.email]
-        if (userDashboard && userDashboard.tiles && userDashboard.tiles.length > 0) {
+      // Execute ping login
+      await pingLogin()
+
+      // Load dashboard configuration from backend API
+      const response = await apiClient.post('/get_dashboard', { username: user.email })
+      
+      if (response && response.dashboard) {
+        const dashboardData = response.dashboard
+        
+        // Check if dashboard has tiles and is finished
+        if (dashboardData.tiles && dashboardData.tiles.length > 0 && dashboardData.finished_or_make_api_call) {
           setDashboardConfig({
-            title: data.dashboard.title,
-            ...userDashboard
+            title: "NalFlo Dashboard", // Default title since backend doesn't provide one
+            gridSize: dashboardData.gridSize,
+            tiles: dashboardData.tiles
           })
         } else {
-          console.warn(`No dashboard configuration found for user: ${user.email}`)
-          // Fallback to a default configuration or show error
+          console.warn(`Dashboard not ready for user: ${user.email}`, dashboardData)
           setDashboardConfig(null)
         }
-        setLoading(false)
-      })
-      .catch(error => {
-        console.error('Error loading dashboard config:', error)
-        setLoading(false)
-      })
+      } else {
+        console.warn(`No dashboard data received for user: ${user.email}`)
+        setDashboardConfig(null)
+      }
+    } catch (error) {
+      console.error('Error loading dashboard from API:', error)
+      setDashboardConfig(null)
+    } finally {
+      setLoading(false)
+      setRefreshLoading(false)
+    }
+  }
+
+  // Expose refresh function globally for Settings component
+  useEffect(() => {
+    window.refreshDashboard = () => loadDashboardData(true)
+  }, [user])
+
+  useEffect(() => {
+    loadDashboardData(false)
   }, [user])
 
   // Check for empty user first
@@ -71,13 +95,18 @@ const Dashboard = ({ user, onLogout }) => {
     )
   }
 
-  if (loading) {
+  if (loading || refreshLoading) {
     return (
       <div className="dashboard">
         <Navbar user={user} onLogout={onLogout} />
         <div className="dashboard-loading">
           <div className="loading-spinner"></div>
-          <p>Loading your dashboard...</p>
+          <p>{refreshLoading ? 'Refreshing your dashboard...' : 'Loading your dashboard...'}</p>
+          {refreshLoading && (
+            <div className="loading-bar">
+              <div className="loading-progress"></div>
+            </div>
+          )}
         </div>
       </div>
     )

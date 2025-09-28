@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard'
 import APIEngine from './components/APIEngine'
 import CreateNewAPI from './components/CreateNewAPI'
 import ViewAPI from './components/ViewAPI'
+import Settings from './components/Settings'
 import './App.css'
 
 function App() {
@@ -84,6 +85,14 @@ function App() {
             element={
               isAuthenticated ? 
               <ViewAPI user={user} onLogout={handleLogout} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              isAuthenticated ? 
+              <Settings user={user} onLogout={handleLogout} /> : 
               <Navigate to="/login" replace />
             } 
           />

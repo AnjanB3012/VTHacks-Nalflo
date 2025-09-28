@@ -15,7 +15,7 @@ user_db = {
         "password": "demo123",
         "name": "Demo User",
         "email": "demo@nalflo.com",
-        "dash_preferences": {},
+        "dash_preferences": {"user_input": ""},
         "APIs": {},
         "files": {},
         "last_login": datetime.now(timezone.utc).timestamp(),
@@ -45,13 +45,46 @@ def refresh_dashboard(username):
     apis = user_db[username]['APIs']
     apis_available = {}
     for api in apis:
-        apis_available[api] = apis[api]['description']
+        apis_available[api] = apis[api]['description']+ "\n" + "Request body: " + apis[api]['body_format']
     response = processor.call_ai(user_preferences=user_db[username]['dash_preferences'], apis_available=apis_available)
     user_db[username]['latest_dashboard'] = response
     save_server()
     return jsonify({"message": "Dashboard refreshed successfully"}), 200
 
 # New APIs go here
+
+@app.route('/weather', methods=['POST'])
+def weather():
+    try:
+        import requests
+        city = 'Blacksburg'
+        coords = {
+            "Blacksburg": {"lat": 37.2296, "lon": -80.4139}
+        }
+        if city not in coords:
+            print("City not supported")
+
+        url = "https://api.open-meteo.com/v1/forecast"
+        params = {
+            "latitude": coords[city]["lat"],
+            "longitude": coords[city]["lon"],
+            "current_weather": True
+        }
+
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            weather = response.json()["current_weather"]
+            return jsonify({
+                "city": city,
+                "temperature": weather["temperature"],
+                "windspeed": weather["windspeed"],
+                "time": weather["time"]
+            }), 200
+        else:
+            return jsonify({"error": "Failed to fetch weather"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/create_api', methods=['POST'])
 def create_api():
@@ -368,6 +401,31 @@ def get_dashboard():
     username = data.get('username')
     if user_db[username]['latest_dashboard'] is None:
         refresh_dashboard(username)
+    elif user_db[username]['last_login'] < datetime.now(timezone.utc).timestamp() - 900:
+        refresh_dashboard(username)
     return jsonify({"dashboard": user_db[username]['latest_dashboard']}), 200
+
+@app.route('/get_user_dash_config', methods=['POST'])
+def get_user_dash_config():
+    data = request.get_json()
+    username = data.get('username')
+    return jsonify({"dash_config": user_db[username]['dash_preferences']['user_input']}), 200
+
+@app.route('/update_user_dash_config', methods=['POST'])
+def update_user_dash_config():
+    data = request.get_json()
+    username = data.get('username')
+    user_input = data.get('user_input')
+    user_db[username]['dash_preferences']['user_input'] = user_input
+    save_server()
+    return jsonify({"message": "User dashboard config updated successfully"}), 200
+
+@app.route('/force_refresh_dashboard', methods=['POST'])
+def force_refresh_dashboard():
+    data = request.get_json()
+    username = data.get('username')
+    refresh_dashboard(username)
+    return jsonify({"message": "Dashboard refreshed successfully"}), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
