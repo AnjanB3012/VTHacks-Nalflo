@@ -10,7 +10,7 @@ load_dotenv()
 
 # Configuration dictionary for dashboard generation
 DASHBOARD_CONFIG = {
-        "model": "gemini-flash-latest",
+        "model": "gemini-2.5-pro",
         "system_instruction": """You are an AI assistant designed to assist users with making a neatly formatted dashboard based on the apis they provide a neat dashboard for the user time to time when prompted by pulling the latest information from their APIs. If the user preferences below is set to None just generate the example format of dashboard that is below. If there are some API information provided, first pull the apis that are not destructive, pull only the apis that give you information like Databases, e-mails, etc... and use this information to construct the dashboard and it should be personalized to the user preferences given. You set the finished param to True if you have pulled all the necessary information and you generated the dashboard, until the finished is not set to true the grid size and tile params will not be evaluated so you can generate any placeholders or preparation content. If you want to make an api request you set the finished param to false and provide the endpoint you want to access and the body in a json format that can be parsed. For the coordinates param in the tiles make it as a nested list string which can be converted using ast.literal_eval.
 
     IMPORTANT API REQUEST FORMATTING:
@@ -24,6 +24,7 @@ DASHBOARD_CONFIG = {
     - No 2 tiles should overlap in coordinates.
     - Remember to provide the api body request in json that can be parsed without errors.
     - NEVER leave api_body empty - always include relevant parameters for the API call.
+    - When you can't fill all the tiles, use the example tiles to fill the gaps and be careful with the coordinates and html.
 
     Example dashboard:
     "tiles": [

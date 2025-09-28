@@ -5,6 +5,7 @@ import re
 import json
 from datetime import datetime, timezone
 from AIProcessor import AIProcessor
+import requests
 
 app = Flask(__name__)
 
@@ -52,38 +53,6 @@ def refresh_dashboard(username):
     return jsonify({"message": "Dashboard refreshed successfully"}), 200
 
 # New APIs go here
-
-@app.route('/weather', methods=['POST'])
-def weather():
-    try:
-        import requests
-        city = 'Blacksburg'
-        coords = {
-            "Blacksburg": {"lat": 37.2296, "lon": -80.4139}
-        }
-        if city not in coords:
-            print("City not supported")
-
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": coords[city]["lat"],
-            "longitude": coords[city]["lon"],
-            "current_weather": True
-        }
-
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            weather = response.json()["current_weather"]
-            return jsonify({
-                "city": city,
-                "temperature": weather["temperature"],
-                "windspeed": weather["windspeed"],
-                "time": weather["time"]
-            }), 200
-        else:
-            return jsonify({"error": "Failed to fetch weather"}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/create_api', methods=['POST'])
@@ -401,7 +370,7 @@ def get_dashboard():
     username = data.get('username')
     if user_db[username]['latest_dashboard'] is None:
         refresh_dashboard(username)
-    elif user_db[username]['last_login'] < datetime.now(timezone.utc).timestamp() - 900:
+    elif user_db[username]['last_login'] < datetime.now(timezone.utc).timestamp() - 10800:
         refresh_dashboard(username)
     return jsonify({"dashboard": user_db[username]['latest_dashboard']}), 200
 
