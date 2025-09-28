@@ -1,0 +1,82 @@
+{
+  "dashboard": {
+    "title": "NalFlo Dashboard",
+    "demo@nalflo.com": {
+      "gridSize": { "rows": 4, "cols": 8 },
+      "tiles": [
+        {
+          "id": "analytics",
+          "title": "Analytics Overview",
+          "coordinates": [[0, 0], [1, 0], [1, 1], [0, 1]],
+          "html": "<div class=\"tile-content graph-tile\"><div class=\"chart-placeholder\"><div class=\"chart-bars\"><div class=\"bar\" style=\"height: 60%\"></div><div class=\"bar\" style=\"height: 80%\"></div><div class=\"bar\" style=\"height: 45%\"></div><div class=\"bar\" style=\"height: 90%\"></div><div class=\"bar\" style=\"height: 70%\"></div></div><p class=\"chart-label\">Analytics Data</p></div></div>"
+        },
+        {
+          "id": "user-stats",
+          "title": "User Statistics",
+          "coordinates": [[0, 2], [1, 2], [1, 2], [0, 2]],
+          "html": "<div class=\"tile-content metric-tile\"><div class=\"metric-value\">1,234</div><div class=\"metric-label\">Active Users</div><div class=\"metric-trend positive\">+12%</div></div>"
+        },
+        {
+          "id": "revenue",
+          "title": "Revenue",
+          "coordinates": [[0, 5], [0, 5], [0, 6], [0, 6]],
+          "html": "<div class=\"tile-content metric-tile\"><div class=\"metric-value\">$45,678</div><div class=\"metric-label\">Monthly Revenue</div><div class=\"metric-trend positive\">+8%</div></div>"
+        },
+        {
+          "id": "notifications",
+          "title": "Recent Notifications",
+          "coordinates": [[0, 3], [1, 3], [1, 4], [0, 4]],
+          "html": "<div class=\"tile-content list-tile\"><ul class=\"list-items\"><li class=\"list-item\"><span class=\"list-bullet\">•</span>System update completed</li><li class=\"list-item\"><span class=\"list-bullet\">•</span>New user registered</li><li class=\"list-item\"><span class=\"list-bullet\">•</span>Payment processed</li></ul></div>"
+        },
+        {
+          "id": "activity-feed",
+          "title": "Activity Feed",
+          "coordinates": [[2, 5], [3, 5], [3, 6], [2, 6]],
+          "html": "<div class=\"tile-content activity-tile\"><div class=\"activity-items\"><div class=\"activity-item\"><div class=\"activity-user\">John Doe</div><div class=\"activity-action\">created project</div><div class=\"activity-time\">2m ago</div></div><div class=\"activity-item\"><div class=\"activity-user\">Jane Smith</div><div class=\"activity-action\">updated settings</div><div class=\"activity-time\">5m ago</div></div><div class=\"activity-item\"><div class=\"activity-user\">Mike Johnson</div><div class=\"activity-action\">uploaded file</div><div class=\"activity-time\">10m ago</div></div></div></div>"
+        },
+        {
+          "id": "quick-actions",
+          "title": "Quick Actions",
+          "coordinates": [[2, 7], [3, 7], [3, 7], [2, 7]],
+          "html": "<div class=\"tile-content buttons-tile\"><div class=\"button-grid\"><button class=\"tile-button\">New Project</button><button class=\"tile-button\">Export Data</button><button class=\"tile-button\">Settings</button></div></div>"
+        },
+        {
+          "id": "weather",
+          "title": "Weather",
+          "coordinates": [[0, 7], [1, 7], [1, 7], [0, 7]],
+          "html": "<div class=\"tile-content widget-tile\"><div class=\"widget-icon\">🌤️</div><div class=\"widget-location\">San Francisco</div><div class=\"widget-temp\">72°F</div><div class=\"widget-condition\">Sunny</div></div>"
+        },
+        {
+          "id": "performance",
+          "title": "Performance",
+          "coordinates": [[1, 5], [1, 5], [1, 6], [1, 6]],
+          "html": "<div class=\"tile-content metric-tile\"><div class=\"metric-value\">98.5%</div><div class=\"metric-label\">Uptime</div><div class=\"metric-trend positive\">+0.2%</div></div>"
+        },
+        {
+          "id": "storage",
+          "title": "Storage",
+          "coordinates": [[2, 0], [3, 0], [3, 0], [2, 0]],
+          "html": "<div class=\"tile-content metric-tile\"><div class=\"metric-value\">2.4TB</div><div class=\"metric-label\">Used Storage</div><div class=\"metric-trend positive\">+5%</div></div>"
+        },
+        {
+          "id": "alerts",
+          "title": "System Alerts",
+          "coordinates": [[3, 3], [3, 3], [3, 4], [3, 4]],
+          "html": "<div class=\"tile-content list-tile\"><ul class=\"list-items\"><li class=\"list-item\"><span class=\"list-bullet\">•</span>High CPU usage detected</li><li class=\"list-item\"><span class=\"list-bullet\">•</span>Database backup completed</li><li class=\"list-item\"><span class=\"list-bullet\">•</span>New user registration</li><li class=\"list-item\"><span class=\"list-bullet\">•</span>System maintenance scheduled</li></ul></div>"
+        },
+        {
+          "id": "network",
+          "title": "Network Traffic",
+          "coordinates": [[2, 1], [3, 1], [3, 2], [2, 2]],
+          "html": "<div class=\"tile-content graph-tile\"><div class=\"chart-placeholder\"><div class=\"chart-bars\"><div class=\"bar\" style=\"height: 60%\"></div><div class=\"bar\" style=\"height: 80%\"></div><div class=\"bar\" style=\"height: 45%\"></div><div class=\"bar\" style=\"height: 90%\"></div><div class=\"bar\" style=\"height: 70%\"></div></div><p class=\"chart-label\">Analytics Data</p></div></div>"
+        },
+        {
+          "id": "security",
+          "title": "Security Status",
+          "coordinates": [[2, 3], [2, 3], [2, 4], [2, 4]],
+          "html": "<div class=\"tile-content metric-tile\"><div class=\"metric-value\">Secure</div><div class=\"metric-label\">System Status</div><div class=\"metric-trend positive\">✓</div></div>"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,85 @@
+.dashboard {
+  height: 100vh;
+  width: 100vw;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e1e5e9;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.dashboard-loading p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.dashboard-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f8f9fa;
+  text-align: center;
+}
+
+.dashboard-error h2 {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.dashboard-error p {
+  color: #666;
+}
+
+/* Header removed */
+
+.dashboard-grid {
+  padding: 0.5rem;
+  background: #f8f9fa;
+  align-content: start;
+  justify-content: start;
+  width: fit-content;
+  min-width: 100%;
+}
+
+.dashboard-viewport {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  min-width: 0;
+  min-height: 0;
+  padding-top: 82px; /* reserve space for fixed navbar height */
+  position: relative;
+}
+
+/* remove extra fade bar; navbar itself is glassy */
+.viewport-fade { display: none; }
+
+.dashboard-grid {
+  position: relative;
+  z-index: 0;
+}
