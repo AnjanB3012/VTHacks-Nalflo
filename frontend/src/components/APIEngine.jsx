@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from './Navbar'
 import './APIEngine.css'
@@ -6,66 +6,61 @@ import './APIEngine.css'
 const APIEngine = ({ user, onLogout }) => {
   const navigate = useNavigate()
   const [selectedTab, setSelectedTab] = useState('apis')
+  const [apiData, setApiData] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // Sample API data
-  const apiData = [
-    {
-      id: 1,
-      endpoint: '/api/v1/users',
-      description: 'Retrieve all users in the system',
-      method: 'GET',
-      status: 'Active'
-    },
-    {
-      id: 2,
-      endpoint: '/api/v1/users/{id}',
-      description: 'Get a specific user by ID',
-      method: 'GET',
-      status: 'Active'
-    },
-    {
-      id: 3,
-      endpoint: '/api/v1/users',
-      description: 'Create a new user account',
-      method: 'POST',
-      status: 'Active'
-    },
-    {
-      id: 4,
-      endpoint: '/api/v1/users/{id}',
-      description: 'Update user information',
-      method: 'PUT',
-      status: 'Active'
-    },
-    {
-      id: 5,
-      endpoint: '/api/v1/users/{id}',
-      description: 'Delete a user account',
-      method: 'DELETE',
-      status: 'Active'
-    },
-    {
-      id: 6,
-      endpoint: '/api/v1/auth/login',
-      description: 'Authenticate user and get access token',
-      method: 'POST',
-      status: 'Active'
-    },
-    {
-      id: 7,
-      endpoint: '/api/v1/auth/logout',
-      description: 'Invalidate user session',
-      method: 'POST',
-      status: 'Active'
-    },
-    {
-      id: 8,
-      endpoint: '/api/v1/dashboard/data',
-      description: 'Get dashboard analytics data',
-      method: 'GET',
-      status: 'Active'
+  useEffect(() => {
+    fetchAPIs()
+  }, [])
+
+  // Refresh APIs when component becomes visible (e.g., when navigating back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchAPIs()
+      }
     }
-  ]
+
+    const handleFocus = () => {
+      fetchAPIs()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [])
+
+  const fetchAPIs = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/get_apis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: user.email }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const apis = Object.entries(data.APIs).map(([endpoint, apiInfo], index) => ({
+          id: index + 1,
+          endpoint: endpoint,
+          description: apiInfo.description,
+          method: 'POST', // All APIs are POST by default in your system
+          status: 'Active'
+        }))
+        setApiData(apis)
+      }
+    } catch (error) {
+      console.error('Error fetching APIs:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Sample Files data
   const filesData = [
@@ -136,9 +131,9 @@ const APIEngine = ({ user, onLogout }) => {
   ]
 
   const handleViewAPI = (api) => {
-    // In a real application, this would open a modal or navigate to API details
-    console.log('Viewing API:', api)
-    alert(`Viewing API: ${api.endpoint}\nMethod: ${api.method}\nDescription: ${api.description}`)
+    // Navigate to ViewAPI page with encoded endpoint
+    const encodedEndpoint = encodeURIComponent(api.endpoint)
+    navigate(`/view-api/${encodedEndpoint}`)
   }
 
   const handleViewFile = (file) => {
@@ -183,35 +178,47 @@ const APIEngine = ({ user, onLogout }) => {
                   Create New API
                 </button>
               </div>
-              <table className="api-table">
-                <thead>
-                  <tr>
-                    <th>Endpoint</th>
-                    <th>Description</th>
-                    <th>View API</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {apiData.map(api => (
-                    <tr key={api.id}>
-                      <td className="endpoint-cell">
-                        <code>{api.endpoint}</code>
-                      </td>
-                      <td className="description-cell">
-                        {api.description}
-                      </td>
-                      <td className="action-cell">
-                        <button 
-                          className="view-button"
-                          onClick={() => handleViewAPI(api)}
-                        >
-                          View API
-                        </button>
-                      </td>
+              {loading ? (
+                <div className="loading-message">Loading APIs...</div>
+              ) : (
+                <table className="api-table">
+                  <thead>
+                    <tr>
+                      <th>Endpoint</th>
+                      <th>Description</th>
+                      <th>View API</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {apiData.length === 0 ? (
+                      <tr>
+                        <td colSpan="3" className="no-data">
+                          No APIs found. Create your first API to get started!
+                        </td>
+                      </tr>
+                    ) : (
+                      apiData.map(api => (
+                        <tr key={api.id}>
+                          <td className="endpoint-cell">
+                            <code>{api.endpoint}</code>
+                          </td>
+                          <td className="description-cell">
+                            {api.description}
+                          </td>
+                          <td className="action-cell">
+                            <button 
+                              className="view-button"
+                              onClick={() => handleViewAPI(api)}
+                            >
+                              View API
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           ) : (
             <div>

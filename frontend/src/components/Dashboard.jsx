@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import Navbar from './Navbar'
 import Tile from './Tile'
+import ApiClient from './ApiClient'
 import './Dashboard.css'
 
 const Dashboard = ({ user, onLogout }) => {
   const [dashboardConfig, setDashboardConfig] = useState(null)
   const [loading, setLoading] = useState(true)
+  const apiClient = new ApiClient()
 
   // Debug logging
   console.log('Dashboard rendered with user:', user)
@@ -18,6 +20,20 @@ const Dashboard = ({ user, onLogout }) => {
       setLoading(false)
       return
     }
+
+    // Send ping login to update last login timestamp
+    const pingLogin = async () => {
+      try {
+        await apiClient.post('/pinglogin', { username: user.email })
+        console.log('Ping login successful for user:', user.email)
+      } catch (error) {
+        console.error('Ping login failed:', error)
+        // Don't block dashboard loading if ping login fails
+      }
+    }
+
+    // Execute ping login
+    pingLogin()
 
     fetch('/dash_config.json')
       .then(response => response.json())

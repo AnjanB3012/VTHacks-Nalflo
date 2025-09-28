@@ -6,6 +6,7 @@ import Signup from './components/Signup'
 import Dashboard from './components/Dashboard'
 import APIEngine from './components/APIEngine'
 import CreateNewAPI from './components/CreateNewAPI'
+import ViewAPI from './components/ViewAPI'
 import './App.css'
 
 function App() {
@@ -75,6 +76,14 @@ function App() {
             element={
               isAuthenticated ? 
               <CreateNewAPI user={user} onLogout={handleLogout} /> : 
+              <Navigate to="/login" replace />
+            } 
+          />
+          <Route 
+            path="/view-api/:endpoint" 
+            element={
+              isAuthenticated ? 
+              <ViewAPI user={user} onLogout={handleLogout} /> : 
               <Navigate to="/login" replace />
             } 
           />
